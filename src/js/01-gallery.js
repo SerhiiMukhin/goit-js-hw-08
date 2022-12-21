@@ -4,7 +4,21 @@ import { galleryItems } from './gallery-items';
 
 import SimpleLightbox from "simplelightbox";
 
-console.log(SimpleLightbox)
+import "simplelightbox/dist/simple-lightbox.min.css";
 
-
-console.log(galleryItems);
+const galleryContainer = document.querySelector('.gallery');
+const markup = galleryItems
+.map(
+    ({ preview, original, description }) => `
+<a class="gallery__item" href="${original}">
+  <img 
+  class="gallery__image" 
+  src="${preview}" 
+  alt="${description}" />
+  </a>`
+  )
+  .join('');
+  
+  galleryContainer.insertAdjacentHTML('beforeend', markup);
+  
+  const lightbox = new SimpleLightbox('.gallery a', {captionsData: 'alt', captionDelay: 250});
