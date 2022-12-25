@@ -13,7 +13,6 @@ function onPlay({ seconds }) {
 
 function setTime() {
   let time = localStorage.getItem(TIME_KEY);
-  console.log(time)
   if (time !== null) {
     player.setCurrentTime(time);
   }
