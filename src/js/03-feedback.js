@@ -1,31 +1,59 @@
 import throttle from 'lodash.throttle';
 
+// // Змінні
 const form = document.querySelector('.feedback-form');
-form.addEventListener('input', throttle(onFormData, 500));
-form.addEventListener('submit', onSubmitForm);
+const emailInput = document.querySelector("input[name='email']");
+const messageInput = document.querySelector("textarea[name='message']");
 
-const formData = {};
+const LOCAL_KEY = 'feedback-form-state';
 
-function onFormData(event) {
-  formData[event.target.name] = event.target.value;
-  localStorage.setItem('feedback-form-state', JSON.stringify(formData));
-}
+let localData = JSON.parse(localStorage.getItem(LOCAL_KEY)) || {};
 
-function onSubmitForm(event) {
-  console.log(JSON.parse(localStorage.getItem('feedback-form-state')));
+// // Прослуховувачі подій
+form.addEventListener('submit', onSubmit);
+emailInput.addEventListener('input', throttle(onEmailChange, 500));
+messageInput.addEventListener('input', throttle(onMessageChange, 500));
+
+onPageLoad();
+
+// Функції
+
+function onSubmit(event) {
   event.preventDefault();
-  event.currentTarget.reset();
-  localStorage.removeItem('feedback-form-state');
+
+  if (emailInput.value && messageInput.value) {
+    event.currentTarget.reset();
+    console.log(localData);
+    localStorage.removeItem(LOCAL_KEY);
+    localData = {};
+  } else {
+    alert('Заповніть всі поля!');
+  }
 }
 
-function dataFromLocalStorage() {
-  const data = JSON.parse(localStorage.getItem('feedback-form-state'));
-  const email = document.querySelector('.feedback-form input');
-  const message = document.querySelector('.feedback-form textarea');
-  if (data) {
-    email.value = data.email;
-    message.value = data.message;
-  }
-};
+function onEmailChange(event) {
+  let email = event.target.value;
+  localData.email = email;
+  saveData();
+}
 
-dataFromLocalStorage();
+function onMessageChange(event) {
+  let message = event.target.value;
+  localData.message = message;
+  saveData();
+}
+
+function saveData() {
+  const strData = JSON.stringify(localData);
+  localStorage.setItem(LOCAL_KEY, strData);
+}
+
+function onPageLoad() {
+  const localSavedData = localStorage.getItem(LOCAL_KEY);
+  if (localSavedData) {
+    const parsedData = JSON.parse(localSavedData);
+
+    emailInput.value = parsedData.email || '';
+    messageInput.value = parsedData.message || '';
+  }
+}
